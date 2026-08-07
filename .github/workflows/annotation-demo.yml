@@ -28,7 +28,8 @@ jobs:
         continue-on-error: true
         run: >-
           node src/cli.js audit
-          --cwd=test/fixtures/pnpm-bad
+          --cwd=test/fixtures/npm-versions
+          --rule=direct-deps-exact
           --github-summary
           --github-annotations
           --max-github-annotations=8
