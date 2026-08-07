@@ -1,4 +1,8 @@
 node_modules
+# These minimal manifests intentionally model installed dependencies in tests.
+!test/fixtures/**/node_modules/
+!test/fixtures/**/node_modules/**/
+!test/fixtures/**/node_modules/**/package.json
 .deps-warden-cache
 coverage
 *.log
