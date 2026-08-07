@@ -319,6 +319,12 @@ The CLI equivalents are `--github-summary`, `--github-annotations`, and
 `GITHUB_STEP_SUMMARY` environment variable. Workflow commands are escaped and
 credentials remain subject to the normal output redaction layer.
 
+To see the UI without weakening a real project, manually run the repository's
+`annotation-demo` workflow. It audits the intentionally insecure dependency
+ranges in `test/fixtures/npm-versions/package.json`, emits example annotations
+on lines 6–9 and a job summary, then verifies that the audit failed as expected
+while keeping the demonstration job successful.
+
 ## Exit codes
 
 | code | meaning |

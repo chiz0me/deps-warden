@@ -218,6 +218,7 @@ addCommonOptions(program.command('audit'))
     if (opts.githubAnnotations) {
       await writeStream(process.stdout, renderGitHubAnnotations(result, {
         cwd: opts.cwd,
+        repositoryRoot: process.env.GITHUB_WORKSPACE ?? opts.cwd,
         maxAnnotations: opts.maxGithubAnnotations,
       }));
     }
