@@ -31,5 +31,6 @@ export { createScanCheckpoint, createScanFingerprint, SCAN_CHECKPOINT_SCHEMA } f
 export { applyOrgPolicy, isMandatoryInOrgProfile, loadGovernedExceptions, parseGovernedExceptions, validateGovernedExceptions, ORG_POLICY_PROFILES, ORG_EXCEPTIONS_VERSION } from './lib/orgPolicy.js';
 export { createScanJobManager, pageReport, SCAN_JOB_SCHEMA, scanJobInputFingerprint } from './lib/scanJobs.js';
 export { createScanHttpServer, listenScanHttpServer } from './lib/httpServer.js';
+export { appendGitHubStepSummary, renderGitHubAnnotations, renderGitHubSummary } from './lib/githubActions.js';
 export { scanGitHubOrganization, mapLimit } from './commands/orgScan.js';
 export { createDepsWardenMcpServer, summarizeMcpReport, pageMcpReport, githubScanCheckCatalog } from './mcpServer.js';

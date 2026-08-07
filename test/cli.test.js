@@ -10,9 +10,9 @@ const runCli = promisify(execFile);
 const CLI = resolve(import.meta.dirname, '..', 'src', 'cli.js');
 const FIX = (name) => resolve(import.meta.dirname, 'fixtures', name);
 
-async function run(args, { allowError = false } = {}) {
+async function run(args, { allowError = false, env = {} } = {}) {
   try {
-    const r = await runCli(process.execPath, [CLI, ...args]);
+    const r = await runCli(process.execPath, [CLI, ...args], { env: { ...process.env, ...env } });
     return { code: 0, stdout: r.stdout, stderr: r.stderr };
   } catch (err) {
     if (!allowError) throw err;
@@ -37,6 +37,19 @@ describe('cli', () => {
     expect(r.code).toBe(1);
     expect(r.stdout).toMatch(/STATUS: FAIL/);
     expect(r.stdout).toMatch(/FINDING:/);
+  });
+
+  it('audit writes a GitHub summary and emits capped native annotations', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'dw-cli-github-'));
+    const summary = join(dir, 'summary.md');
+    const r = await run([
+      'audit', '--cwd', FIX('pnpm-bad'), '--github-summary',
+      '--github-annotations', '--max-github-annotations', '2',
+    ], { allowError: true, env: { GITHUB_STEP_SUMMARY: summary } });
+    expect(r.code).toBe(1);
+    expect(r.stdout.match(/^::(?:error|warning|notice) /gm)).toHaveLength(2);
+    expect(await readFile(summary, 'utf8')).toMatch(/deps-warden audit/);
+    expect(await readFile(summary, 'utf8')).toMatch(/Recommended action/);
   });
 
   it('rules subcommand lists RULE: records', async () => {

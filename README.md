@@ -293,6 +293,9 @@ jobs:
           report-level: low
           fail-level: high
           require-complete: true
+          job-summary: true       # human-readable Markdown dashboard
+          annotations: true       # native file/line annotations
+          max-annotations: 20     # keep large audits usable
           # rules: ...           # optional: run only these rules
           # severity: high       # optional: minimum severity to report
           # check-versions: true # optional: query the registry (network)
@@ -301,9 +304,20 @@ jobs:
 
 Without `fail-on`, the step uses `fail-level` and also fails on incomplete
 required evidence. When `fail-on` is configured, only those rule findings gate
-the result, while `require-complete` remains independently fail-closed. The full
-audit and remediation hints are written to the job summary either way. The CLI
-equivalent is `npx --yes deps-warden@0.1.0 audit --fail-on <ids>`.
+the result, while `require-complete` remains independently fail-closed.
+
+The action writes a Markdown dashboard containing the gate decision, severity
+counts, evidence coverage, file locations, remediation guidance, and next
+steps. It also emits native GitHub annotations: critical/high findings are
+errors, medium findings are warnings, and low findings are notices. Annotations
+are capped to avoid overwhelming pull requests; the job summary remains the
+authoritative human view. Disable either channel with `job-summary: false` or
+`annotations: false`.
+
+The CLI equivalents are `--github-summary`, `--github-annotations`, and
+`--max-github-annotations=<n>`. `--github-summary` requires GitHub's
+`GITHUB_STEP_SUMMARY` environment variable. Workflow commands are escaped and
+credentials remain subject to the normal output redaction layer.
 
 ## Exit codes
 

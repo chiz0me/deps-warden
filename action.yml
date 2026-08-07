@@ -48,6 +48,18 @@ inputs:
     description: Output format (toon|json|text).
     required: false
     default: toon
+  job-summary:
+    description: Write a human-readable Markdown audit summary to the GitHub job summary.
+    required: false
+    default: 'true'
+  annotations:
+    description: Emit native file and line annotations for audit findings.
+    required: false
+    default: 'true'
+  max-annotations:
+    description: Maximum native annotations to emit; the job summary still contains up to 50 findings.
+    required: false
+    default: '20'
 
 runs:
   using: composite
@@ -67,8 +79,11 @@ runs:
         DW_CHECK_VERSIONS: ${{ inputs.check-versions }}
         DW_REQUIRE_COMPLETE: ${{ inputs.require-complete }}
         DW_FORMAT: ${{ inputs.format }}
+        DW_JOB_SUMMARY: ${{ inputs.job-summary }}
+        DW_ANNOTATIONS: ${{ inputs.annotations }}
+        DW_MAX_ANNOTATIONS: ${{ inputs.max-annotations }}
       run: |
-        set -uo pipefail
+        set -euo pipefail
         args=(audit "--format=${DW_FORMAT}")
         [ -n "${DW_RULES}" ] && args+=("--rule=${DW_RULES}")
         [ -n "${DW_FAIL_ON}" ] && args+=("--fail-on=${DW_FAIL_ON}")
@@ -77,17 +92,9 @@ runs:
         [ -n "${DW_FAIL_LEVEL}" ] && args+=("--fail-level=${DW_FAIL_LEVEL}")
         [ "${DW_CHECK_VERSIONS}" = "true" ] && args+=(--check-versions)
         [ "${DW_REQUIRE_COMPLETE}" = "true" ] && args+=(--require-complete)
+        [ "${DW_JOB_SUMMARY}" = "true" ] && args+=(--github-summary)
+        if [ "${DW_ANNOTATIONS}" = "true" ]; then
+          args+=(--github-annotations "--max-github-annotations=${DW_MAX_ANNOTATIONS}")
+        fi
 
-        out="$(npx --yes "deps-warden@${DW_VERSION}" "${args[@]}" 2>&1)"
-        code=$?
-
-        {
-          echo "### deps-warden audit"
-          echo ""
-          echo '```'
-          printf '%s\n' "${out}"
-          echo '```'
-        } >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
-
-        printf '%s\n' "${out}"
-        exit "${code}"
+        npx --yes "deps-warden@${DW_VERSION}" "${args[@]}"

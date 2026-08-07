@@ -35,6 +35,11 @@ import { createGitHubAppTokenProvider } from './lib/githubAppAuth.js';
 import { loadGovernedExceptions, ORG_POLICY_PROFILES } from './lib/orgPolicy.js';
 import { diffOrgReports } from './lib/orgReportDiff.js';
 import { writeOrgArtifactBundle } from './lib/orgArtifacts.js';
+import {
+  appendGitHubStepSummary,
+  renderGitHubAnnotations,
+  renderGitHubSummary,
+} from './lib/githubActions.js';
 
 const PM_KINDS = ['npm', 'pnpm'];
 const SEVERITIES = ['low', 'medium', 'high', 'critical'];
@@ -182,6 +187,9 @@ addCommonOptions(program.command('audit'))
   .addOption(new Option('--network <mode>', 'network mode').choices(['off', 'registry']))
   .option('--verbose', 'include SKIP records explaining which rules did not apply and why', false)
   .option('--require-complete', 'fail when required evidence is unavailable', undefined)
+  .option('--github-summary', 'append a human-readable report to GITHUB_STEP_SUMMARY', false)
+  .option('--github-annotations', 'emit native GitHub workflow annotations for findings', false)
+  .option('--max-github-annotations <n>', 'maximum native annotations to emit (0-50)', parseAnnotationLimit, 20)
   .action(async (opts) => {
     const selectedRules = splitList((opts.rule ?? []).join(','));
     const failOn = splitList((opts.failOn ?? []).join(','));
@@ -202,6 +210,17 @@ addCommonOptions(program.command('audit'))
     });
     const payload = renderAudit(result, { format: opts.format, cwd: opts.cwd, verbose: Boolean(opts.verbose) });
     await emit(payload, opts);
+    if (opts.githubSummary) {
+      const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+      if (!summaryPath) throw new Error('--github-summary requires GITHUB_STEP_SUMMARY');
+      await appendGitHubStepSummary(summaryPath, renderGitHubSummary(result, { cwd: opts.cwd }));
+    }
+    if (opts.githubAnnotations) {
+      await writeStream(process.stdout, renderGitHubAnnotations(result, {
+        cwd: opts.cwd,
+        maxAnnotations: opts.maxGithubAnnotations,
+      }));
+    }
     process.exitCode = result.status === 'OK' ? 0 : 1;
   });
 
@@ -383,6 +402,12 @@ function parseInteger(value) {
   if (!/^\d+$/.test(value)) throw new Error(`expected a non-negative integer, got: ${value}`);
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed)) throw new Error(`integer is too large: ${value}`);
+  return parsed;
+}
+
+function parseAnnotationLimit(value) {
+  const parsed = parseInteger(value);
+  if (parsed > 50) throw new Error(`maximum GitHub annotations is 50, got: ${value}`);
   return parsed;
 }
 
