@@ -20,6 +20,14 @@ jobs:
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: '24.18.0'
+          # Node 24 currently bundles npm 11, but this project deliberately
+          # enforces npm 12 through devEngines. Avoid setup-node invoking the
+          # bundled npm while probing its automatic package-manager cache.
+          package-manager-cache: false
+      - name: Install pinned npm
+        working-directory: /tmp
+        run: npm install --global npm@12.0.2 --ignore-scripts
+      - run: npm --version
       - run: npm ci
       - run: npm run verify-deps
       - run: npm audit --audit-level=high
