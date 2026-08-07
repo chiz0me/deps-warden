@@ -1,0 +1,93 @@
+name: deps-warden
+description: Audit npm/pnpm supply-chain configuration with policy-aware CI gates.
+author: Naveen Yagati
+branding:
+  icon: shield
+  color: purple
+
+inputs:
+  working-directory:
+    description: Directory to audit.
+    required: false
+    default: '.'
+  version:
+    description: deps-warden version or dist-tag to run via npx. Pin it (e.g. 0.1.0) for reproducible CI.
+    required: false
+    default: '0.1.0'
+  rules:
+    description: Comma-separated rule ids to run. Empty runs all rules.
+    required: false
+    default: ''
+  fail-on:
+    description: >-
+      Comma-separated rule ids that fail the build. The full report is always
+      shown; only these rules affect the exit code. Empty means any finding fails.
+    required: false
+    default: ''
+  severity:
+    description: Legacy shorthand for both report-level and fail-level.
+    required: false
+    default: ''
+  report-level:
+    description: Minimum severity to display (low|medium|high|critical).
+    required: false
+    default: ''
+  fail-level:
+    description: Minimum severity that fails the gate (low|medium|high|critical).
+    required: false
+    default: ''
+  check-versions:
+    description: Query the npm registry for outdated/deprecated/freshly-published deps (opt-in network).
+    required: false
+    default: 'false'
+  require-complete:
+    description: Fail when git or requested registry evidence is unavailable.
+    required: false
+    default: 'false'
+  format:
+    description: Output format (toon|json|text).
+    required: false
+    default: toon
+
+runs:
+  using: composite
+  steps:
+    # Inputs are passed through `env`, never interpolated into the script body,
+    # so workflow inputs cannot inject shell. Requires Node on PATH (run
+    # actions/setup-node before this step).
+    - shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        DW_VERSION: ${{ inputs.version }}
+        DW_RULES: ${{ inputs.rules }}
+        DW_FAIL_ON: ${{ inputs.fail-on }}
+        DW_SEVERITY: ${{ inputs.severity }}
+        DW_REPORT_LEVEL: ${{ inputs.report-level }}
+        DW_FAIL_LEVEL: ${{ inputs.fail-level }}
+        DW_CHECK_VERSIONS: ${{ inputs.check-versions }}
+        DW_REQUIRE_COMPLETE: ${{ inputs.require-complete }}
+        DW_FORMAT: ${{ inputs.format }}
+      run: |
+        set -uo pipefail
+        args=(audit "--format=${DW_FORMAT}")
+        [ -n "${DW_RULES}" ] && args+=("--rule=${DW_RULES}")
+        [ -n "${DW_FAIL_ON}" ] && args+=("--fail-on=${DW_FAIL_ON}")
+        [ -n "${DW_SEVERITY}" ] && args+=("--severity=${DW_SEVERITY}")
+        [ -n "${DW_REPORT_LEVEL}" ] && args+=("--report-level=${DW_REPORT_LEVEL}")
+        [ -n "${DW_FAIL_LEVEL}" ] && args+=("--fail-level=${DW_FAIL_LEVEL}")
+        [ "${DW_CHECK_VERSIONS}" = "true" ] && args+=(--check-versions)
+        [ "${DW_REQUIRE_COMPLETE}" = "true" ] && args+=(--require-complete)
+
+        out="$(npx --yes "deps-warden@${DW_VERSION}" "${args[@]}" 2>&1)"
+        code=$?
+
+        {
+          echo "### deps-warden audit"
+          echo ""
+          echo '```'
+          printf '%s\n' "${out}"
+          echo '```'
+        } >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+
+        printf '%s\n' "${out}"
+        exit "${code}"

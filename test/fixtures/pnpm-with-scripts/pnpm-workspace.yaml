@@ -1,0 +1,11 @@
+packages:
+  - .
+allowBuilds:
+  esbuild: true
+  sharp: true
+  lodash: true
+strictDepBuilds: true
+dangerouslyAllowAllBuilds: false
+minimumReleaseAge: 10080
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false

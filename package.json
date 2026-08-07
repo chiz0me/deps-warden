@@ -1,0 +1,95 @@
+{
+  "name": "deps-warden",
+  "version": "0.1.0",
+  "description": "Audit npm and pnpm supply-chain misconfigurations with safe, machine-readable output.",
+  "author": "Naveen Yagati",
+  "homepage": "https://github.com/chiz0me/deps-warden#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chiz0me/deps-warden.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chiz0me/deps-warden/issues"
+  },
+  "type": "module",
+  "packageManager": "npm@12.0.2",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./commands/audit": "./src/commands/audit.js",
+    "./commands/fix": "./src/commands/fix.js",
+    "./commands/org-scan": "./src/commands/orgScan.js"
+  },
+  "bin": {
+    "deps-warden": "./src/cli.js",
+    "deps-warden-mcp": "./src/mcp.js",
+    "deps-warden-http": "./src/http.js"
+  },
+  "files": [
+    "src",
+    "skills",
+    "docs",
+    "README.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=11.16.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^22.22.2 || >=24.15.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=12.0.0 <13",
+      "onFail": "error"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "lint": "oxlint src test",
+    "verify-deps": "node scripts/verify-deps.js",
+    "audit": "npm audit --audit-level=high",
+    "mcp": "node src/mcp.js",
+    "sbom": "npm sbom --sbom-format=cyclonedx",
+    "release:verify": "npm run verify-deps && npm run lint && npm test && npm audit --audit-level=high && npm pack --dry-run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.0.0",
+    "actions-warden": "0.2.0",
+    "commander": "14.0.3",
+    "picomatch": "4.0.4",
+    "semver": "7.8.1",
+    "yaml": "2.9.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "oxlint": "1.67.0",
+    "vitest": "4.1.6"
+  },
+  "keywords": [
+    "npm",
+    "pnpm",
+    "yarn",
+    "bun",
+    "supply-chain",
+    "security",
+    "audit",
+    "lockfile",
+    "lifecycle-scripts",
+    "toon",
+    "llm",
+    "mcp",
+    "github-organization"
+  ],
+  "license": "MIT"
+}

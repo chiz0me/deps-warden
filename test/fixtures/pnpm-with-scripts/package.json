@@ -1,0 +1,11 @@
+{
+  "name": "fixture-pnpm-with-scripts",
+  "version": "1.0.0",
+  "packageManager": "pnpm@11.0.0",
+  "engines": { "node": ">=20.0.0" },
+  "dependencies": {
+    "esbuild": "0.20.0",
+    "sharp": "0.33.0",
+    "lodash": "4.17.21"
+  }
+}

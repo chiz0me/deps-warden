@@ -1,0 +1,7 @@
+{
+  "name": "npm-old-npm-fixture",
+  "version": "1.0.0",
+  "packageManager": "npm@10.5.0",
+  "engines": { "node": ">=20" },
+  "dependencies": {}
+}

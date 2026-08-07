@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "deps-warden",
+  "displayName": "Deps Warden",
+  "version": "0.1.0",
+  "description": "Audit supply-chain misconfigurations across npm/pnpm/yarn/bun. Safe-by-default CLI with LLM-friendly TOON output.",
+  "author": {
+    "name": "Naveen Yagati"
+  },
+  "homepage": "https://github.com/chiz0me/deps-warden#readme",
+  "repository": "https://github.com/chiz0me/deps-warden",
+  "license": "MIT",
+  "keywords": [
+    "npm",
+    "pnpm",
+    "yarn",
+    "bun",
+    "supply-chain",
+    "security",
+    "audit",
+    "lifecycle-scripts",
+    "toon"
+  ]
+}

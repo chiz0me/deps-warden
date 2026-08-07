@@ -1,0 +1,11 @@
+{
+  "name": "npm-versions-fixture",
+  "version": "1.0.0",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "oldmajor": "^1.2.0",
+    "gonebad": "^2.0.0",
+    "freshpkg": "^1.0.0",
+    "goodpkg": "^2.0.0"
+  }
+}

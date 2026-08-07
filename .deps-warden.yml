@@ -1,0 +1,11 @@
+version: 1
+scan:
+  reportLevel: low
+  failLevel: high
+  rules: []
+  failOn: []
+  explain: true
+  requireComplete: true
+network:
+  mode: off
+  trustedRegistries: []

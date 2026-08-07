@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deps Warden"
+  short_description: "Harden projects and GitHub org supply chains"
+  default_prompt: "Use $deps-warden to audit this project or GitHub organization, explain the highest-risk findings, and prepare reviewable hardening changes."

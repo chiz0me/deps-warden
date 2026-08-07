@@ -1,0 +1,7 @@
+node_modules
+.deps-warden-cache
+coverage
+*.log
+.DS_Store
+dist
+.claude

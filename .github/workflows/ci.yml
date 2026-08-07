@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: '24.18.0'
+      - run: npm ci
+      - run: npm run verify-deps
+      - run: npm audit --audit-level=high
+      - run: npm test
+      - name: dogfood (clean fixture)
+        run: node src/cli.js audit --cwd test/fixtures/pnpm
+      - name: dogfood (bad fixture exits 1)
+        run: |
+          if node src/cli.js audit --cwd test/fixtures/pnpm-bad ; then
+            echo "expected non-zero exit"; exit 1
+          fi

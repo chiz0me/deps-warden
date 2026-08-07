@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["import", "unicorn"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "rules": {
+    "no-await-in-loop": "off",
+    "unicorn/consistent-function-scoping": "off"
+  },
+  "ignorePatterns": ["test/fixtures/**", "node_modules/**", "coverage/**", "dist/**"]
+}
