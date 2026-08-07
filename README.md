@@ -6,9 +6,27 @@ Safe-by-default CLI with machine-readable JSON and compact TOON output.
 Yarn and Bun detection exists so unsupported projects fail explicitly; their
 full adapters are planned and are not presented as completed audits.
 
+> **Release status:** `deps-warden` is not published to npm yet. The examples
+> below use the checked-out source. After the first npm release, replace
+> `node src/cli.js` with `npx --yes deps-warden@<exact-version>`; never use a
+> floating tag in a security gate.
+
+```bash
+git clone git@github.com:chiz0me/deps-warden.git
+cd deps-warden
+npm ci
+node src/cli.js audit
 ```
-npx --yes deps-warden@0.1.0 audit
-```
+
+## Documentation
+
+| Guide | Use it for |
+|---|---|
+| [CLI reference](./docs/CLI.md) | Commands, output formats, thresholds, remediation, and exit codes |
+| [GitHub Actions](./docs/GITHUB_ACTIONS.md) | CI setup, job summaries, annotations, demo workflow, and troubleshooting |
+| [GitHub organization scans](./docs/GITHUB_ORG_SCAN.md) | Authentication, 1,000+ repository operation, reports, MCP, HTTP, and webhooks |
+| [Mandatory baseline](./docs/SUPPLY_CHAIN_BASELINE.md) | The controls required for a complete supply-chain security program |
+| [Security policy](./SECURITY.md) | Vulnerability reporting, project security guarantees, and scope |
 
 ## What it does
 
@@ -46,33 +64,33 @@ only mutates with an explicit `--write`.
 
 ```bash
 # Audit the current project (TOON output, default)
-npx --yes deps-warden@0.1.0 audit
+node src/cli.js audit
 
 # JSON output
-npx --yes deps-warden@0.1.0 audit --format=json
+node src/cli.js audit --format=json
 
 # Filter to high+ severity only
-npx --yes deps-warden@0.1.0 audit --severity=high
+node src/cli.js audit --severity=high
 
 # Also check the registry for outdated/deprecated/freshly-published deps (opt-in network)
-npx --yes deps-warden@0.1.0 audit --check-versions
+node src/cli.js audit --check-versions
 
 # List available rules
-npx --yes deps-warden@0.1.0 rules
+node src/cli.js rules
 
 # Create and validate a remediation plan
-npx --yes deps-warden@0.1.0 plan --finding=<id> --output=deps-warden-plan.json
-npx --yes deps-warden@0.1.0 apply deps-warden-plan.json
+node src/cli.js plan --finding=<id> --output=deps-warden-plan.json
+node src/cli.js apply deps-warden-plan.json
 
 # Apply the unchanged plan after review
-npx --yes deps-warden@0.1.0 apply deps-warden-plan.json --write
+node src/cli.js apply deps-warden-plan.json --write
 
 # Create and validate a versioned project policy
-npx --yes deps-warden@0.1.0 policy init --write
-npx --yes deps-warden@0.1.0 policy validate
+node src/cli.js policy init --write
+node src/cli.js policy validate
 
 # Scan a GitHub organization (JSON is the canonical report format)
-GITHUB_TOKEN=... npx --yes deps-warden@0.1.0 github-scan example-org --format=json --output-path=org-report.json
+GITHUB_TOKEN=... node src/cli.js github-scan example-org --format=json --output-path=org-report.json
 ```
 
 ## GitHub organization scanning
@@ -98,7 +116,7 @@ count, provide `--expected-repos=<inventory count>`; otherwise inventory
 coverage is `unknown` and the report fails closed. Useful controls:
 
 ```bash
-deps-warden github-scan example-org \
+node src/cli.js github-scan example-org \
   --concurrency=4 \
   --wait-for-rate-limit \
   --exclude-archived \
@@ -158,7 +176,8 @@ AI assistants can use the same scanner over the official MCP stdio transport:
 {
   "mcpServers": {
     "deps-warden": {
-      "command": "/absolute/path/to/node_modules/.bin/deps-warden-mcp"
+      "command": "node",
+      "args": ["/absolute/path/to/deps-warden/src/mcp.js"]
     }
   }
 }
@@ -207,7 +226,7 @@ blanket exceptions:
 npm approve-scripts --allow-scripts-pending
 
 # Audit project policy, including npm v12 source restrictions
-npx --yes deps-warden@0.1.0 audit --rule npm-version-supported npm-allow-scripts npm-v12-source-controls npm-dangerous-script-bypass
+node src/cli.js audit --rule npm-version-supported npm-allow-scripts npm-v12-source-controls npm-dangerous-script-bypass
 ```
 
 For npm older than 11.16, first move to a supported Node.js release. When that
@@ -273,7 +292,12 @@ true` for the mandatory baseline.
 ## Use in CI
 
 `deps-warden` ships a GitHub Action. Prefer a committed project policy and
-complete-evidence gating; `fail-on` remains available for gradual adoption:
+complete-evidence gating; `fail-on` remains available for gradual adoption.
+The composite action installs the exact npm package selected by its `version`
+input, so it becomes usable after that package version is published. Until
+then, invoke `node src/cli.js audit` from a checkout. See the
+[GitHub Actions guide](./docs/GITHUB_ACTIONS.md) for both forms and the live
+annotation demonstration.
 
 ```yaml
 permissions:
@@ -299,7 +323,7 @@ jobs:
           # rules: ...           # optional: run only these rules
           # severity: high       # optional: minimum severity to report
           # check-versions: true # optional: query the registry (network)
-          # version: 0.1.0       # pin the deps-warden version
+          # version: '<exact-published-version>'
 ```
 
 Without `fail-on`, the step uses `fail-level` and also fails on incomplete

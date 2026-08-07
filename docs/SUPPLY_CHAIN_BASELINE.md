@@ -72,14 +72,14 @@ network:
 Run the local gate with:
 
 ```sh
-deps-warden audit --require-complete
+node src/cli.js audit --require-complete
 ```
 
 Collect the GitHub portion of the baseline with a GitHub App installation token
 and retain the canonical JSON report:
 
 ```sh
-GITHUB_TOKEN=... deps-warden github-scan example-org \
+GITHUB_TOKEN=... node src/cli.js github-scan example-org \
   --wait-for-rate-limit \
   --format=json \
   --output-path=org-report.json

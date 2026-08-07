@@ -17,10 +17,11 @@ Prefer a repository-local, lockfile-pinned binary:
 ./node_modules/.bin/deps-warden audit --format=json
 ```
 
-If no local binary exists, obtain approval before downloading or executing a
-package, then use an exact version such as
-`npx --yes deps-warden@0.1.0 audit --format=json`. Never use an unpinned npm
-dist-tag for a supply-chain audit.
+If this is the deps-warden source checkout and no local binary exists, use
+`node src/cli.js audit --format=json`. The npm package is not published yet;
+do not claim that an `npx deps-warden` command currently works. After an npm
+release exists, obtain approval before downloading or executing it and use an
+exact version. Never use an unpinned npm dist-tag for a supply-chain audit.
 
 Useful global flags: `--cwd <dir>`, `--pm npm|pnpm`,
 `--format toon|json|text`, `--output stdout|file`, `--output-path <path>`,
