@@ -112,11 +112,12 @@ export function renderGitHubSummary(result, opts = {}) {
  * Render GitHub workflow commands for file-aware annotations.
  *
  * @param {import('../commands/audit.js').AuditResult} result
- * @param {{cwd?: string, maxAnnotations?: number}} [opts]
+ * @param {{cwd?: string, repositoryRoot?: string, maxAnnotations?: number}} [opts]
  * @returns {string}
  */
 export function renderGitHubAnnotations(result, opts = {}) {
   const cwd = opts.cwd ?? process.cwd();
+  const repositoryRoot = opts.repositoryRoot ?? cwd;
   const maxAnnotations = boundedCount(opts.maxAnnotations ?? 20, 0, 50, 'maxAnnotations');
   const candidates = [];
 
@@ -132,7 +133,7 @@ export function renderGitHubAnnotations(result, opts = {}) {
     const line = Number.isSafeInteger(finding.line) && finding.line > 0 ? finding.line : undefined;
     // GitHub defaults an omitted line to line 1 when a file is present. Avoid
     // inventing that precision for rules that only identify a file.
-    const file = line ? annotationPath(finding.file, cwd) : undefined;
+    const file = line ? annotationPath(finding.file, repositoryRoot) : undefined;
     candidates.push({
       level: ANNOTATION_LEVELS[finding.severity] ?? 'warning',
       title: `deps-warden: ${finding.ruleId} (${finding.severity})`,

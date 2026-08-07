@@ -59,6 +59,17 @@ describe('GitHub Actions presentation', () => {
     expect(annotations).toContain('100%25 now%0A::error injected');
   });
 
+  it('uses repository-root paths when auditing a nested working directory', () => {
+    const repositoryRoot = '/workspace/project';
+    const cwd = join(repositoryRoot, 'packages', 'app');
+    const annotations = renderGitHubAnnotations(result(cwd), {
+      cwd,
+      repositoryRoot,
+      maxAnnotations: 1,
+    });
+    expect(annotations).toContain('file=packages/app/package.json');
+  });
+
   it('bounds untrusted annotation and summary content', () => {
     const cwd = '/workspace/project';
     const large = result(cwd);

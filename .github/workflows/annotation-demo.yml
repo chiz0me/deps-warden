@@ -1,0 +1,39 @@
+name: annotation-demo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  demonstrate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: '24.18.0'
+          package-manager-cache: false
+      - name: Install pinned npm
+        working-directory: /tmp
+        run: npm install --global npm@12.0.2 --ignore-scripts
+      - run: npm ci
+      - name: Emit example annotations and job summary
+        id: audit
+        continue-on-error: true
+        run: >-
+          node src/cli.js audit
+          --cwd=test/fixtures/pnpm-bad
+          --github-summary
+          --github-annotations
+          --max-github-annotations=8
+      - name: Verify the intentionally bad fixture failed its audit
+        if: always()
+        env:
+          AUDIT_OUTCOME: ${{ steps.audit.outcome }}
+        run: test "${AUDIT_OUTCOME}" = failure
