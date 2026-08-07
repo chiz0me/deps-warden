@@ -269,9 +269,12 @@ Other exports: `renderAudit`, `renderFix`, `renderRules`, `buildContext`,
 - **CI gating.** A GitHub Action ships at the repo root (`uses: chiz0me/deps-warden@<sha>`,
   inputs: `fail-on`, `rules`, `severity`, `report-level`, `fail-level`,
   `require-complete`, `check-versions`, `version`,
-  `working-directory`). It runs `audit`, writes the report to the job summary,
-  and fails the job only on `fail-on` rules. Equivalent to
-  `npx deps-warden audit --fail-on <ids>`.
+  `working-directory`, `job-summary`, `annotations`, `max-annotations`). It
+  runs `audit`, writes a bounded human-readable Markdown dashboard to the job
+  summary, emits escaped native file/line annotations, and fails the job only
+  on the configured gate. Equivalent CLI presentation flags are
+  `--github-summary`, `--github-annotations`, and
+  `--max-github-annotations=<n>`.
 
 ## Mandatory baseline
 
