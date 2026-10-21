@@ -64,7 +64,7 @@
     "release:verify": "npm run verify-deps && npm run lint && npm test && npm audit --audit-level=high && npm pack --dry-run"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.0.0",
+    "@modelcontextprotocol/server": "2.3.0",
     "actions-warden": "0.2.0",
     "commander": "14.0.3",
     "picomatch": "4.0.4",
