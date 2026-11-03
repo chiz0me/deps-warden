@@ -70,7 +70,7 @@
     "picomatch": "4.0.4",
     "semver": "7.8.1",
     "yaml": "2.9.0",
-    "zod": "4.4.3"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "oxlint": "1.67.0",
